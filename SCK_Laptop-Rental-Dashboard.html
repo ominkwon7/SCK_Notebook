@@ -1,0 +1,1886 @@
+<!DOCTYPE html>
+<html lang="ko"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laptop Rental Dashboard</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F4F5F7;
+    --surface:#FFFFFF;
+    --surface-alt:#FAFBFC;
+    --border:#E4E7EC;
+    --border-strong:#D3D7DE;
+    --text:#1A2233;
+    --text-secondary:#6B7684;
+    --text-tertiary:#9AA3AF;
+    --brand:#16324F;
+    --brand-strong:#0F2439;
+    --danger:#D6483F;
+    --danger-bg:#FDECEB;
+    --warning:#E08E2B;
+    --warning-bg:#FCF3E5;
+    --success:#2E9E5B;
+    --success-bg:#E9F7EE;
+    --accent-blue:#2E86AB;
+    --volume:#D93A3A;
+    --volume-bg:#FBEAEA;
+    --aec:#2E6FAB;
+    --aec-bg:#E7EFF6;
+    --dm:#E2761F;
+    --dm-bg:#FCEEE0;
+    --me:#1CA3DE;
+    --me-bg:#EAF6FC;
+    --radius-sm:6px;
+    --radius-md:10px;
+    --radius-lg:14px;
+    --shadow-1:0 1px 2px rgba(16,24,40,.06), 0 1px 3px rgba(16,24,40,.08);
+    --shadow-2:0 8px 24px rgba(16,24,40,.14);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Pretendard", -apple-system, BlinkMacSystemFont, "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+    -webkit-font-smoothing:antialiased;
+    font-size:14px;
+    line-height:1.5;
+  }
+  button{font-family:inherit;cursor:pointer;}
+  input,select{font-family:inherit;font-size:14px;}
+  .app{
+    max-width:1440px;
+    margin:0 auto;
+    padding:28px 32px 60px;
+  }
+
+  /* ---------- Header ---------- */
+  .app-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:8px;
+  }
+  .header-actions{
+    display:flex;align-items:center;gap:8px;flex:none;
+  }
+  .admin-pill{
+    font-size:11px;font-weight:700;color:var(--success);
+    background:var(--success-bg);border:1px solid var(--success);
+    padding:3px 10px;border-radius:999px;
+  }
+  .view-only-hint{
+    font-size:12.5px;color:var(--text-secondary);
+    background:var(--surface-alt);border:1px solid var(--border);
+    border-radius:var(--radius-sm);padding:8px 12px;margin:0 0 16px;
+  }
+  .app-header .titles h1{
+    font-size:22px;
+    font-weight:700;
+    letter-spacing:-0.02em;
+    margin:0 0 4px;
+    color:var(--brand-strong);
+  }
+  .app-header .titles p{
+    margin:0;
+    font-size:13px;
+    color:var(--text-secondary);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .shared-badge{
+    display:inline-flex;align-items:center;gap:5px;
+    font-size:11.5px;font-weight:700;color:var(--brand);
+    background:#EDF2F7;border:1px solid var(--border-strong);
+    padding:2px 9px;border-radius:999px;
+  }
+  .shared-dot{
+    width:6px;height:6px;border-radius:50%;background:var(--success);
+    box-shadow:0 0 0 2px var(--success-bg);
+  }
+  .sync-status{
+    font-size:11.5px;font-weight:600;color:var(--success);
+  }
+  .loading-screen{
+    position:fixed;inset:0;background:var(--bg);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+    color:var(--text-secondary);font-size:13.5px;font-weight:600;
+  }
+  .loading-spinner{
+    width:34px;height:34px;border-radius:50%;
+    border:3px solid var(--border-strong);border-top-color:var(--brand);
+    animation:spin .8s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    border-radius:var(--radius-sm);
+    border:1px solid var(--border-strong);
+    background:var(--surface);
+    color:var(--text);
+    padding:9px 16px;
+    font-size:13.5px;
+    font-weight:600;
+    transition:background .12s ease, border-color .12s ease;
+  }
+  .btn:hover{background:var(--surface-alt);}
+  .btn-primary{
+    background:var(--brand);
+    border-color:var(--brand);
+    color:#fff;
+  }
+  .btn-primary:hover{background:var(--brand-strong);}
+  .btn-danger{
+    background:var(--surface);
+    border-color:var(--danger);
+    color:var(--danger);
+  }
+  .btn-danger:hover{background:var(--danger-bg);}
+  .btn-ghost{
+    border-color:transparent;
+    background:transparent;
+    padding:6px 10px;
+  }
+  .btn-ghost:hover{background:var(--surface-alt);}
+  .btn-sm{padding:6px 12px;font-size:12.5px;}
+
+  /* ---------- Summary cards ---------- */
+  .summary-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:14px;
+    margin-bottom:16px;
+  }
+  .summary-card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius-md);
+    padding:16px 18px;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    box-shadow:var(--shadow-1);
+  }
+  .summary-card .label{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:12.5px;
+    color:var(--text-secondary);
+    font-weight:600;
+  }
+  .dot{width:8px;height:8px;border-radius:50%;flex:none;}
+  .dot.total{background:var(--brand);}
+  .dot.inuse{background:var(--aec);}
+  .dot.available{background:var(--success);}
+  .dot.returntoday{background:var(--accent-blue);}
+  .summary-card .value{
+    font-size:30px;
+    font-weight:700;
+    letter-spacing:-0.02em;
+    color:var(--text);
+  }
+  .summary-card .value span{
+    font-size:14px;
+    font-weight:500;
+    color:var(--text-tertiary);
+    margin-left:2px;
+  }
+
+  /* ---------- Industry usage ---------- */
+  .panel{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius-md);
+    padding:18px 20px;
+    box-shadow:var(--shadow-1);
+  }
+  .panel + .panel{margin-top:16px;}
+  .panel-title{
+    font-size:13.5px;
+    font-weight:700;
+    color:var(--text);
+    margin:0 0 14px;
+  }
+  .industry-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:18px;
+  }
+  .industry-row .industry-row-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    margin-bottom:6px;
+  }
+  .industry-name{
+    display:flex;align-items:center;gap:7px;
+    font-size:13px;font-weight:600;color:var(--text);
+  }
+  .industry-qty{font-size:13px;color:var(--text-secondary);}
+  .industry-qty b{color:var(--text);font-weight:700;}
+  .bar-track{
+    width:100%;height:8px;border-radius:5px;background:var(--surface-alt);
+    border:1px solid var(--border);overflow:hidden;
+  }
+  .bar-fill{height:100%;border-radius:5px;transition:width .25s ease;}
+
+  /* ---------- Toolbar ---------- */
+  .toolbar{
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+    gap:16px;
+    margin:20px 0 14px;
+    flex-wrap:wrap;
+  }
+  .filter-group{display:flex;gap:6px;flex-wrap:wrap;}
+  .filter-chip{
+    border:1px solid var(--border-strong);
+    background:var(--surface);
+    border-radius:999px;
+    padding:6px 14px;
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--text-secondary);
+  }
+  .filter-chip.active{
+    background:var(--brand);
+    border-color:var(--brand);
+    color:#fff;
+  }
+  .search-box{
+    position:relative;
+    min-width:220px;
+  }
+  .search-box input{
+    width:100%;
+    padding:8px 12px 8px 32px;
+    border:1px solid var(--border-strong);
+    border-radius:var(--radius-sm);
+    background:var(--surface);
+    outline:none;
+  }
+  .search-box input:focus{border-color:var(--brand);}
+  .search-box svg{
+    position:absolute;left:10px;top:50%;transform:translateY(-50%);
+    color:var(--text-tertiary);
+  }
+  .month-nav{
+    display:flex;align-items:center;gap:4px;
+  }
+  .month-nav .month-label{
+    font-size:14.5px;font-weight:700;min-width:104px;text-align:center;color:var(--text);
+  }
+  .icon-btn{
+    width:30px;height:30px;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:var(--radius-sm);
+    border:1px solid var(--border-strong);
+    background:var(--surface);color:var(--text-secondary);
+  }
+  .icon-btn:hover{background:var(--surface-alt);}
+
+  /* ---------- Main layout ---------- */
+  .main-grid{
+    display:grid;
+    grid-template-columns:1fr 320px;
+    grid-template-rows:auto 1fr;
+    gap:16px;
+    align-items:start;
+  }
+  .main-grid .toolbar{
+    grid-column:1;
+    grid-row:1;
+    margin:0;
+    padding-top:16px;
+  }
+  .main-grid .calendar{
+    grid-column:1;
+    grid-row:2;
+  }
+  .main-grid .today-panel{
+    grid-column:2;
+    grid-row:2;
+  }
+  .toolbar-right-group{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-left:auto;
+    flex-wrap:wrap;
+  }
+
+  /* ---------- Calendar ---------- */
+  .calendar{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius-md);
+    overflow:hidden;
+    box-shadow:var(--shadow-1);
+  }
+  .weekday-row{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    border-bottom:1px solid var(--border);
+    background:var(--surface-alt);
+  }
+  .weekday-row div{
+    padding:10px 0;
+    text-align:center;
+    font-size:12px;
+    font-weight:700;
+    color:var(--text-secondary);
+  }
+  .weekday-row div.sun{color:var(--danger);}
+  .weekday-row div.sat{color:var(--accent-blue);}
+  .cal-grid{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    grid-auto-rows:minmax(112px,auto);
+  }
+  .cal-cell{
+    border-right:1px solid var(--border);
+    border-bottom:1px solid var(--border);
+    padding:6px 5px 6px;
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    min-width:0;
+  }
+  .cal-cell:nth-child(7n){border-right:none;}
+  .cal-cell.other-month{background:var(--surface-alt);}
+  .cal-cell.other-month .day-num{color:var(--text-tertiary);}
+  .cal-cell.today{background:#F4F9FF;}
+  .cal-cell:hover{background:#F8FAFB;cursor:pointer;}
+  .cal-cell-head{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:3px;
+  }
+  .day-num{font-size:12.5px;font-weight:700;color:var(--text);}
+  .day-num.sun{color:var(--danger);}
+  .day-num.sat{color:var(--accent-blue);}
+  .today .day-num{
+    background:var(--brand);color:#fff;
+    width:20px;height:20px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:11.5px;
+  }
+  .cap-badge{
+    font-size:10px;font-weight:700;padding:1px 6px;border-radius:999px;
+  }
+  .cap-badge.low{background:var(--success-bg);color:var(--success);}
+  .cap-badge.mid{background:var(--warning-bg);color:var(--warning);}
+  .cap-badge.full{background:var(--danger-bg);color:var(--danger);}
+  .event-pill{
+    font-size:11px;
+    font-weight:600;
+    color:#fff;
+    padding:2.5px 7px;
+    height:20px;
+    display:flex;align-items:center;
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+    border-radius:0;
+  }
+  .event-pill.start{border-top-left-radius:5px;border-bottom-left-radius:5px;margin-left:1px;}
+  .event-pill.end{border-top-right-radius:5px;border-bottom-right-radius:5px;margin-right:1px;}
+  .event-pill.solo{border-radius:5px;margin-left:1px;margin-right:1px;}
+  .event-pill:hover{filter:brightness(1.08);}
+  .event-spacer{height:20px;}
+  .more-link{
+    font-size:10.5px;color:var(--text-tertiary);font-weight:600;padding-left:4px;
+  }
+
+  /* ---------- Sidebar: today's rentals ---------- */
+  .today-panel{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius-md);
+    box-shadow:var(--shadow-1);
+    overflow:hidden;
+  }
+  .today-panel-head{
+    padding:16px 18px 12px;
+    border-bottom:1px solid var(--border);
+  }
+  .today-panel-head h3{margin:0 0 2px;font-size:14px;font-weight:700;}
+  .today-panel-head p{margin:0;font-size:12px;color:var(--text-secondary);}
+  .today-list{
+    max-height:640px;
+    overflow-y:auto;
+    padding:10px;
+    display:flex;flex-direction:column;gap:8px;
+  }
+  .today-item{
+    border:1px solid var(--border);
+    border-left:4px solid var(--brand);
+    border-radius:var(--radius-sm);
+    padding:10px 12px;
+    background:var(--surface-alt);
+    cursor:pointer;
+  }
+  .today-item:hover{background:#F1F3F5;}
+  .today-item .tag{
+    display:inline-block;font-size:10.5px;font-weight:700;color:#fff;
+    padding:2px 8px;border-radius:999px;margin-bottom:6px;
+  }
+  .today-item .name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px;}
+  .today-item .meta{font-size:12px;color:var(--text-secondary);margin-bottom:2px;}
+  .today-item .qty{font-size:12px;font-weight:700;color:var(--text);}
+  .empty-state{
+    text-align:center;
+    color:var(--text-tertiary);
+    font-size:12.5px;
+    padding:30px 12px;
+  }
+
+  /* ---------- Modal ---------- */
+  .overlay{
+    position:fixed;inset:0;background:rgba(15,20,30,.45);
+    display:flex;align-items:center;justify-content:center;
+    z-index:100;padding:20px;
+  }
+  .hidden{display:none !important;}
+  .modal{
+    background:var(--surface);
+    border-radius:var(--radius-lg);
+    width:480px;max-width:100%;
+    max-height:88vh;overflow-y:auto;
+    box-shadow:var(--shadow-2);
+  }
+  .modal-head{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px 20px;border-bottom:1px solid var(--border);
+  }
+  .modal-head h2{font-size:16px;font-weight:700;margin:0;}
+  .modal-body{padding:18px 20px;}
+  .modal-foot{
+    padding:14px 20px;border-top:1px solid var(--border);
+    display:flex;justify-content:flex-end;gap:8px;
+  }
+  .field{margin-bottom:14px;}
+  .field label{
+    display:block;font-size:12.5px;font-weight:700;color:var(--text-secondary);
+    margin-bottom:6px;
+  }
+  .field input, .field select{
+    width:100%;padding:9px 11px;border:1px solid var(--border-strong);
+    border-radius:var(--radius-sm);outline:none;background:var(--surface);color:var(--text);
+  }
+  .field input:focus, .field select:focus{border-color:var(--brand);}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .field-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+  .industry-picker{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+  .industry-option{
+    padding:9px 6px;
+    border-radius:var(--radius-sm);
+    border:1.5px solid var(--border-strong);
+    background:var(--surface);
+    font-size:13px;
+    font-weight:700;
+    color:var(--text-secondary);
+    text-align:center;
+    transition:background .12s ease, color .12s ease, border-color .12s ease;
+  }
+  .industry-option:hover{background:var(--surface-alt);}
+  .industry-option.selected[data-industry="Volume"]{background:var(--volume);border-color:var(--volume);color:#fff;}
+  .industry-option.selected[data-industry="AEC"]{background:var(--aec);border-color:var(--aec);color:#fff;}
+  .industry-option.selected[data-industry="D&M"]{background:var(--dm);border-color:var(--dm);color:#fff;}
+  .industry-option.selected[data-industry="M&E"]{background:var(--me);border-color:var(--me);color:#fff;}
+  .hint{font-size:12px;color:var(--text-secondary);margin-top:6px;}
+  .hint.warn{color:var(--warning);font-weight:600;}
+  .error-box{
+    background:var(--danger-bg);border:1px solid var(--danger);color:var(--danger);
+    border-radius:var(--radius-sm);padding:9px 12px;font-size:12.5px;font-weight:600;
+    margin-bottom:14px;
+  }
+  .success-box{
+    background:var(--success-bg);border:1px solid var(--success);color:var(--success);
+    border-radius:var(--radius-sm);padding:9px 12px;font-size:12.5px;font-weight:600;
+    margin-bottom:14px;
+  }
+  .settings-section-title{
+    font-size:13px;font-weight:700;color:var(--text);margin:0 0 12px;
+  }
+  .settings-divider{
+    border:none;border-top:1px solid var(--border);margin:20px 0;
+  }
+
+
+  /* ---------- Detail popup ---------- */
+  .detail-grid{
+    display:grid;grid-template-columns:96px 1fr;
+    gap:9px 10px;font-size:13px;margin-bottom:8px;
+  }
+  .detail-grid dt{color:var(--text-secondary);font-weight:600;}
+  .detail-grid dd{margin:0;color:var(--text);font-weight:500;}
+  .status-badge{
+    display:inline-block;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:999px;
+  }
+  .status-badge.reserved{background:#E7EFF6;color:var(--accent-blue);}
+  .status-badge.renting{background:var(--warning-bg);color:var(--warning);}
+  .status-badge.returned{background:var(--surface-alt);color:var(--text-tertiary);border:1px solid var(--border);}
+
+  /* ---------- Tooltip ---------- */
+  .tooltip{
+    position:fixed;z-index:200;
+    background:var(--brand-strong);color:#fff;
+    border-radius:var(--radius-md);
+    padding:12px 14px;
+    font-size:12px;
+    width:230px;
+    box-shadow:var(--shadow-2);
+    pointer-events:none;
+  }
+  .tooltip .tt-tag{
+    display:inline-block;font-size:10.5px;font-weight:700;
+    padding:2px 8px;border-radius:999px;background:rgba(255,255,255,.18);
+    margin-bottom:8px;
+  }
+  .tooltip .tt-title{font-size:13px;font-weight:700;margin-bottom:8px;}
+  .tooltip .tt-row{display:flex;justify-content:space-between;gap:10px;margin-bottom:4px;color:rgba(255,255,255,.9);}
+  .tooltip .tt-row span:first-child{color:rgba(255,255,255,.6);}
+  .tooltip .tt-status{
+    margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.18);
+    font-weight:700;
+  }
+
+  @media (max-width:1100px){
+    .main-grid{grid-template-columns:1fr;grid-template-rows:auto;}
+    .main-grid .toolbar,
+    .main-grid .calendar,
+    .main-grid .today-panel{grid-column:1;grid-row:auto;}
+    .today-panel{order:-1;}
+    .today-list{max-height:280px;}
+  }
+  @media (max-width:800px){
+    .summary-grid{grid-template-columns:repeat(2,1fr);}
+    .industry-grid{grid-template-columns:repeat(2,1fr);}
+    .app{padding:18px 14px 40px;}
+    .field-row,.field-row-3{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<div class="loading-screen hidden" id="loadingScreen">
+  <div class="loading-spinner"></div>
+  <p>팀 공유 데이터를 불러오는 중...</p>
+</div>
+
+<div class="app">
+
+  <div class="app-header">
+    <div class="titles">
+      <h1>Laptop Rental Dashboard</h1>
+      <p>
+        보유 노트북 15대의 대여 및 사용 현황을 한눈에 확인하세요
+        <span class="shared-badge" id="sharedBadge" title="공유 저장소가 연결되지 않아 이 브라우저 탭에만 데이터가 존재합니다">
+          <span class="shared-dot"></span><span id="sharedBadgeText">이 화면에만 저장됨</span>
+        </span>
+        <span class="sync-status hidden" id="syncStatus"></span>
+      </p>
+    </div>
+    <div class="header-actions">
+      <span class="admin-pill" id="adminPill">관리자 모드</span>
+      <button class="icon-btn" id="btnOpenSettings" title="설정">⚙</button>
+      <button class="btn btn-sm hidden" id="btnLogin">관리자 로그인</button>
+      <button class="btn btn-sm" id="btnLogout">로그아웃</button>
+    </div>
+  </div>
+  <p class="view-only-hint hidden" id="viewOnlyHint">현재 열람 전용 모드입니다. 일정 등록·수정·삭제는 관리자 로그인 후 이용할 수 있습니다.</p>
+
+  <!-- Summary cards -->
+  <div class="summary-grid" id="summaryGrid"><div class="summary-card"><div class="label"><span class="dot total"></span>전체 노트북</div><div class="value">15<span>대</span></div></div><div class="summary-card"><div class="label"><span class="dot inuse"></span>현재 대여 중</div><div class="value">0<span>대</span></div></div><div class="summary-card"><div class="label"><span class="dot available"></span>사용 가능</div><div class="value">15<span>대</span></div></div><div class="summary-card"><div class="label"><span class="dot returntoday"></span>오늘 반납 예정</div><div class="value">0<span>대</span></div></div></div>
+
+  <!-- Industry usage -->
+  <div class="panel">
+    <p class="panel-title">Industry별 사용 현황 (오늘 기준)</p>
+    <div class="industry-grid" id="industryGrid"><div class="industry-row"><div class="industry-row-top"><div class="industry-name"><span class="dot" style="background:var(--volume)"></span>Volume</div><div class="industry-qty"><b>0</b>대 / 15대</div></div><div class="bar-track"><div class="bar-fill" style="width:0%;background:var(--volume)"></div></div></div><div class="industry-row"><div class="industry-row-top"><div class="industry-name"><span class="dot" style="background:var(--aec)"></span>AEC</div><div class="industry-qty"><b>0</b>대 / 15대</div></div><div class="bar-track"><div class="bar-fill" style="width:0%;background:var(--aec)"></div></div></div><div class="industry-row"><div class="industry-row-top"><div class="industry-name"><span class="dot" style="background:var(--dm)"></span>D&amp;M</div><div class="industry-qty"><b>0</b>대 / 15대</div></div><div class="bar-track"><div class="bar-fill" style="width:0%;background:var(--dm)"></div></div></div><div class="industry-row"><div class="industry-row-top"><div class="industry-name"><span class="dot" style="background:var(--me)"></span>M&amp;E</div><div class="industry-qty"><b>0</b>대 / 15대</div></div><div class="bar-track"><div class="bar-fill" style="width:0%;background:var(--me)"></div></div></div></div>
+  </div>
+
+  <!-- Main -->
+  <div class="main-grid">
+    <!-- Toolbar: scoped to the calendar column's width, sits above the calendar only -->
+    <div class="toolbar">
+      <div class="filter-group" id="filterGroup"><button class="filter-chip active" data-industry="all">전체</button><button class="filter-chip" data-industry="Volume" style="border-color:var(--volume);color:var(--volume);">Volume</button><button class="filter-chip" data-industry="AEC" style="border-color:var(--aec);color:var(--aec);">AEC</button><button class="filter-chip" data-industry="D&amp;M" style="border-color:var(--dm);color:var(--dm);">D&amp;M</button><button class="filter-chip" data-industry="M&amp;E" style="border-color:var(--me);color:var(--me);">M&amp;E</button></div>
+      <div class="search-box">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" id="searchInput" placeholder="교육명, 지역, 장소 검색">
+      </div>
+      <div class="toolbar-right-group">
+        <button class="btn btn-primary btn-sm" id="btnOpenAdd">+ 대여 등록</button>
+        <div class="month-nav">
+          <button class="icon-btn" id="btnPrevMonth">‹</button>
+          <div class="month-label" id="monthLabel">2026년 10월</div>
+          <button class="icon-btn" id="btnNextMonth">›</button>
+          <button class="btn btn-sm" id="btnToday" style="margin-left:6px;">오늘</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="calendar">
+      <div class="weekday-row">
+        <div class="sun">일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div class="sat">토</div>
+      </div>
+      <div class="cal-grid" id="calGrid"><div class="cal-cell other-month" data-date="2026-09-27"><div class="cal-cell-head"><span class="day-num sun">27</span><span class="cap-badge low">0/15</span></div><div class="event-spacer"></div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell other-month" data-date="2026-09-28"><div class="cal-cell-head"><span class="day-num">28</span><span class="cap-badge low">0/15</span></div><div class="event-spacer"></div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell other-month" data-date="2026-09-29"><div class="cal-cell-head"><span class="day-num">29</span><span class="cap-badge low">0/15</span></div><div class="event-pill start" style="background:#9AA3AF" data-rental-id="r1">Volume | 국제우주항공기술대전 | 1대</div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell other-month" data-date="2026-09-30"><div class="cal-cell-head"><span class="day-num">30</span><span class="cap-badge low">1/15</span></div><div class="event-pill " style="background:#9AA3AF" data-rental-id="r1">&nbsp;</div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell" data-date="2026-10-01"><div class="cal-cell-head"><span class="day-num">1</span><span class="cap-badge low">0/15</span></div><div class="event-pill " style="background:#9AA3AF" data-rental-id="r1">&nbsp;</div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell" data-date="2026-10-02"><div class="cal-cell-head"><span class="day-num">2</span><span class="cap-badge low">0/15</span></div><div class="event-pill end" style="background:#9AA3AF" data-rental-id="r1">&nbsp;</div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell" data-date="2026-10-03"><div class="cal-cell-head"><span class="day-num sat">3</span><span class="cap-badge low">0/15</span></div><div class="event-spacer"></div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell" data-date="2026-10-04"><div class="cal-cell-head"><span class="day-num sun">4</span><span class="cap-badge low">0/15</span></div><div class="event-spacer"></div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell" data-date="2026-10-05"><div class="cal-cell-head"><span class="day-num">5</span><span class="cap-badge low">1/15</span></div><div class="event-pill solo" style="background:#9AA3AF" data-rental-id="r2">Volume | ? | 1대</div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell today" data-date="2026-10-06"><div class="cal-cell-head"><span class="day-num">6</span><span class="cap-badge low">0/15</span></div><div class="event-spacer"></div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell" data-date="2026-10-07"><div class="cal-cell-head"><span class="day-num">7</span><span class="cap-badge low">0/15</span></div><div class="event-spacer"></div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell" data-date="2026-10-08"><div class="cal-cell-head"><span class="day-num">8</span><span class="cap-badge low">0/15</span></div><div class="event-spacer"></div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell" data-date="2026-10-09"><div class="cal-cell-head"><span class="day-num">9</span><span class="cap-badge low">0/15</span></div><div class="event-spacer"></div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell" data-date="2026-10-10"><div class="cal-cell-head"><span class="day-num sat">10</span><span class="cap-badge low">0/15</span></div><div class="event-spacer"></div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell" data-date="2026-10-11"><div class="cal-cell-head"><span class="day-num sun">11</span><span class="cap-badge low">0/15</span></div><div class="event-spacer"></div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell" data-date="2026-10-12"><div class="cal-cell-head"><span class="day-num">12</span><span class="cap-badge low">0/15</span></div><div class="event-pill start" style="background:var(--volume)" data-rental-id="r3">Volume | AutoCAD 정기교육 | 15대</div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell" data-date="2026-10-13"><div class="cal-cell-head"><span class="day-num">13</span><span class="cap-badge low">0/15</span></div><div class="event-pill " style="background:var(--volume)" data-rental-id="r3">&nbsp;</div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell" data-date="2026-10-14"><div class="cal-cell-head"><span class="day-num">14</span><span class="cap-badge full">대여 불가</span></div><div class="event-pill " style="background:var(--volume)" data-rental-id="r3">&nbsp;</div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell" data-date="2026-10-15"><div class="cal-cell-head"><span class="day-num">15</span><span class="cap-badge full">대여 불가</span></div><div class="event-pill " style="background:var(--volume)" data-rental-id="r3">&nbsp;</div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell" data-date="2026-10-16"><div class="cal-cell-head"><span class="day-num">16</span><span class="cap-badge low">0/15</span></div><div class="event-pill end" style="background:var(--volume)" data-rental-id="r3">&nbsp;</div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell" data-date="2026-10-17"><div class="cal-cell-head"><span class="day-num sat">17</span><span class="cap-badge low">0/15</span></div><div class="event-spacer"></div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell" data-date="2026-10-18"><div class="cal-cell-head"><span class="day-num sun">18</span><span class="cap-badge low">0/15</span></div><div class="event-spacer"></div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell" data-date="2026-10-19"><div class="cal-cell-head"><span class="day-num">19</span><span class="cap-badge full">대여 불가</span></div><div class="event-pill solo" style="background:var(--volume)" data-rental-id="r4">Volume | ? | 15대</div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell" data-date="2026-10-20"><div class="cal-cell-head"><span class="day-num">20</span><span class="cap-badge low">0/15</span></div><div class="event-pill start" style="background:var(--dm)" data-rental-id="r5">D&amp;M | 율촌화학 PDMC 교육(메타유닉스)_Bill | 8대</div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell" data-date="2026-10-21"><div class="cal-cell-head"><span class="day-num">21</span><span class="cap-badge low">8/15</span></div><div class="event-pill " style="background:var(--dm)" data-rental-id="r5">&nbsp;</div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell" data-date="2026-10-22"><div class="cal-cell-head"><span class="day-num">22</span><span class="cap-badge low">0/15</span></div><div class="event-pill end" style="background:var(--dm)" data-rental-id="r5">&nbsp;</div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell" data-date="2026-10-23"><div class="cal-cell-head"><span class="day-num">23</span><span class="cap-badge low">0/15</span></div><div class="event-spacer"></div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell" data-date="2026-10-24"><div class="cal-cell-head"><span class="day-num sat">24</span><span class="cap-badge low">0/15</span></div><div class="event-spacer"></div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell" data-date="2026-10-25"><div class="cal-cell-head"><span class="day-num sun">25</span><span class="cap-badge low">0/15</span></div><div class="event-spacer"></div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell" data-date="2026-10-26"><div class="cal-cell-head"><span class="day-num">26</span><span class="cap-badge low">0/15</span></div><div class="event-spacer"></div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell" data-date="2026-10-27"><div class="cal-cell-head"><span class="day-num">27</span><span class="cap-badge full">대여 불가</span></div><div class="event-pill solo" style="background:var(--me)" data-rental-id="r6">M&amp;E | Flow Studio+Motionbuilder 개념잡기 | 15대</div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell" data-date="2026-10-28"><div class="cal-cell-head"><span class="day-num">28</span><span class="cap-badge low">0/15</span></div><div class="event-spacer"></div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell" data-date="2026-10-29"><div class="cal-cell-head"><span class="day-num">29</span><span class="cap-badge low">0/15</span></div><div class="event-spacer"></div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell" data-date="2026-10-30"><div class="cal-cell-head"><span class="day-num">30</span><span class="cap-badge low">0/15</span></div><div class="event-spacer"></div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell" data-date="2026-10-31"><div class="cal-cell-head"><span class="day-num sat">31</span><span class="cap-badge low">0/15</span></div><div class="event-spacer"></div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell other-month" data-date="2026-11-01"><div class="cal-cell-head"><span class="day-num sun">1</span><span class="cap-badge low">0/15</span></div><div class="event-spacer"></div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell other-month" data-date="2026-11-02"><div class="cal-cell-head"><span class="day-num">2</span><span class="cap-badge low">0/15</span></div><div class="event-pill start" style="background:var(--aec)" data-rental-id="r7">AEC | AEC Docs &amp; Forma 정기교육 | 15대</div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell other-month" data-date="2026-11-03"><div class="cal-cell-head"><span class="day-num">3</span><span class="cap-badge low">0/15</span></div><div class="event-pill " style="background:var(--aec)" data-rental-id="r7">&nbsp;</div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell other-month" data-date="2026-11-04"><div class="cal-cell-head"><span class="day-num">4</span><span class="cap-badge full">대여 불가</span></div><div class="event-pill " style="background:var(--aec)" data-rental-id="r7">&nbsp;</div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell other-month" data-date="2026-11-05"><div class="cal-cell-head"><span class="day-num">5</span><span class="cap-badge low">0/15</span></div><div class="event-pill end" style="background:var(--aec)" data-rental-id="r7">&nbsp;</div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell other-month" data-date="2026-11-06"><div class="cal-cell-head"><span class="day-num">6</span><span class="cap-badge low">0/15</span></div><div class="event-spacer"></div><div class="event-spacer"></div><div class="event-spacer"></div></div><div class="cal-cell other-month" data-date="2026-11-07"><div class="cal-cell-head"><span class="day-num sat">7</span><span class="cap-badge low">0/15</span></div><div class="event-spacer"></div><div class="event-spacer"></div><div class="event-spacer"></div></div></div>
+    </div>
+
+    <div class="today-panel">
+      <div class="today-panel-head">
+        <h3>이달의 대여 현황</h3>
+        <p id="todayDateLabel">2026년 10월 기준</p>
+      </div>
+      <div class="today-list" id="todayList"><div class="today-item" data-rental-id="r1" style="border-left-color:#9AA3AF"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;"><span class="tag" style="background:#9AA3AF;margin-bottom:0;">Volume</span><span class="status-badge returned">반납 완료</span></div><div class="name">국제우주항공기술대전</div><div class="meta">창원 / 창원컨벤션센터</div><div class="meta qty">1대 · 2026.09.29 ~ 2026.10.02</div></div><div class="today-item" data-rental-id="r2" style="border-left-color:#9AA3AF"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;"><span class="tag" style="background:#9AA3AF;margin-bottom:0;">Volume</span><span class="status-badge returned">반납 완료</span></div><div class="name">?</div><div class="meta">? / ?</div><div class="meta qty">1대 · 2026.10.05 ~ 2026.10.05</div></div><div class="today-item" data-rental-id="r3" style="border-left-color:var(--volume)"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;"><span class="tag" style="background:var(--volume);margin-bottom:0;">Volume</span><span class="status-badge reserved">예약</span></div><div class="name">AutoCAD 정기교육</div><div class="meta">천안아산 / 미정</div><div class="meta qty">15대 · 2026.10.12 ~ 2026.10.16</div></div><div class="today-item" data-rental-id="r4" style="border-left-color:var(--volume)"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;"><span class="tag" style="background:var(--volume);margin-bottom:0;">Volume</span><span class="status-badge reserved">예약</span></div><div class="name">?</div><div class="meta">? / ?</div><div class="meta qty">15대 · 2026.10.19 ~ 2026.10.19</div></div><div class="today-item" data-rental-id="r5" style="border-left-color:var(--dm)"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;"><span class="tag" style="background:var(--dm);margin-bottom:0;">D&amp;M</span><span class="status-badge reserved">예약</span></div><div class="name">율촌화학 PDMC 교육(메타유닉스)_Bill</div><div class="meta">서울 / 율촌화학</div><div class="meta qty">8대 · 2026.10.20 ~ 2026.10.22</div></div><div class="today-item" data-rental-id="r6" style="border-left-color:var(--me)"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;"><span class="tag" style="background:var(--me);margin-bottom:0;">M&amp;E</span><span class="status-badge reserved">예약</span></div><div class="name">Flow Studio+Motionbuilder 개념잡기</div><div class="meta">서울, 경기, 인천 / Autodesk 교육장</div><div class="meta qty">15대 · 2026.10.27 ~ 2026.10.27</div></div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="overlay hidden" id="formOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="formTitle">대여 등록</h2>
+      <button class="icon-btn" id="btnCloseForm">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="error-box hidden" id="formError"></div>
+      <div class="field-row">
+        <div class="field">
+          <label>대여일</label>
+          <input type="date" id="fRentalDate">
+        </div>
+        <div class="field">
+          <label>사용 시작일</label>
+          <input type="date" id="fUsageStartDate">
+        </div>
+      </div>
+      <div class="field-row" style="margin-top:14px;">
+        <div class="field">
+          <label>사용 종료일</label>
+          <input type="date" id="fUsageEndDate">
+        </div>
+        <div class="field">
+          <label>반납일</label>
+          <input type="date" id="fReturnDate">
+        </div>
+      </div>
+      <div class="hint" id="availabilityHint"></div>
+      <div class="field" style="margin-top:14px;">
+        <label>사용처 / Industry</label>
+        <div class="industry-picker" id="industryPicker">
+          <button type="button" class="industry-option" data-industry="Volume">Volume</button>
+          <button type="button" class="industry-option" data-industry="AEC">AEC</button>
+          <button type="button" class="industry-option" data-industry="D&amp;M">D&amp;M</button>
+          <button type="button" class="industry-option" data-industry="M&amp;E">M&amp;E</button>
+        </div>
+      </div>
+      <div class="field-row" style="margin-top:14px;">
+        <div class="field">
+          <label>교육명</label>
+          <input type="text" id="fTrainingName" placeholder="예: Revit BIM Training">
+        </div>
+        <div class="field">
+          <label>사용 대수 (1~15)</label>
+          <input type="number" id="fQuantity" min="1" max="15" value="1">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>지역</label>
+          <input type="text" id="fRegion" placeholder="예: 서울">
+        </div>
+        <div class="field">
+          <label>장소</label>
+          <input type="text" id="fLocation" placeholder="예: Autodesk Training Center">
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" id="btnCancelForm">취소</button>
+      <button class="btn btn-primary" id="btnSaveForm">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- Detail Modal -->
+<div class="overlay hidden" id="detailOverlay">
+  <div class="modal" style="width:420px;">
+    <div class="modal-head">
+      <h2>일정 상세</h2>
+      <button class="icon-btn" id="btnCloseDetail">✕</button>
+    </div>
+    <div class="modal-body" id="detailBody"></div>
+    <div class="modal-foot hidden" id="detailAdminFoot" style="justify-content:space-between;">
+      <button class="btn btn-danger btn-sm" id="btnDeleteDetail">삭제</button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-sm" id="btnEditDetail">수정</button>
+        <button class="btn btn-primary btn-sm" id="btnReturnDetail">반납 완료</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Login Modal -->
+<div class="overlay hidden" id="loginOverlay">
+  <div class="modal" style="width:340px;">
+    <div class="modal-head">
+      <h2>관리자 로그인</h2>
+      <button class="icon-btn" id="btnCloseLogin">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="error-box" id="loginError">비밀번호가 올바르지 않습니다.</div>
+      <div class="field">
+        <label>관리자 비밀번호</label>
+        <input type="password" id="fLoginPassword" placeholder="비밀번호 입력">
+      </div>
+      <p class="hint">로그인하지 않아도 캘린더와 일정 조회는 누구나 가능합니다. 등록·수정·삭제·설정 관리는 관리자만 할 수 있습니다.</p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" id="btnCancelLogin">취소</button>
+      <button class="btn btn-primary" id="btnSubmitLogin">로그인</button>
+    </div>
+  </div>
+</div>
+
+<!-- Settings Modal (admin only): change password / download current file -->
+<div class="overlay hidden" id="settingsOverlay">
+  <div class="modal" style="width:460px;">
+    <div class="modal-head">
+      <h2>관리자 설정</h2>
+      <button class="icon-btn" id="btnCloseSettings">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <h3 class="settings-section-title">관리자 비밀번호 변경</h3>
+      <div class="error-box hidden" id="pwError"></div>
+      <div class="success-box hidden" id="pwSuccess">비밀번호가 변경되었습니다.</div>
+      <div class="field">
+        <label>현재 비밀번호</label>
+        <input type="password" id="fCurrentPassword" placeholder="현재 비밀번호 입력">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>새 비밀번호</label>
+          <input type="password" id="fNewPassword" placeholder="새 비밀번호 입력">
+        </div>
+        <div class="field">
+          <label>새 비밀번호 확인</label>
+          <input type="password" id="fNewPasswordConfirm" placeholder="다시 입력">
+        </div>
+      </div>
+      <button class="btn btn-primary btn-sm" id="btnChangePassword">비밀번호 변경</button>
+      <p class="hint">
+        변경한 비밀번호는 이 브라우저 탭에서만 바로 적용됩니다. 새로고침해도 계속 쓰려면 아래에서 현재 상태를 반영한 HTML 파일을 다시 다운로드해서 공유해 주세요.
+      </p>
+
+      <hr class="settings-divider">
+
+      <h3 class="settings-section-title">현재 HTML 파일 다운로드</h3>
+      <p class="hint" style="margin-top:0;">
+        지금 화면의 비밀번호와 등록된 모든 일정을 그대로 담은 HTML 파일을 내려받습니다. 이 파일을 팀원에게 전달하면 같은 상태로 열립니다.
+      </p>
+      <button class="btn btn-sm" id="btnDownloadHtml">⬇ 현재 HTML 파일 다운로드</button>
+
+    </div>
+    <div class="modal-foot">
+      <button class="btn" id="btnCloseSettingsFoot">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- Tooltip -->
+<div class="tooltip hidden" id="tooltip" style="left: 1146px; top: 471px;"><span class="tt-tag">Volume</span><div class="tt-title">국제우주항공기술대전</div><div class="tt-row"><span>지역</span><span>창원</span></div><div class="tt-row"><span>장소</span><span>창원컨벤션센터</span></div><div class="tt-row"><span>대여일</span><span>2026.09.29</span></div><div class="tt-row"><span>사용일</span><span>2026.09.30</span></div><div class="tt-row"><span>반납일</span><span>2026.10.02</span></div><div class="tt-row"><span>사용 대수</span><span>1대</span></div><div class="tt-status" style="color:#9AA3AF">반납 완료</div></div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ================= Constants ================= */
+  var TOTAL_LAPTOPS = 15;
+  var INDUSTRIES = ["Volume","AEC","D&M","M&E"];
+  var INDUSTRY_COLOR = { "Volume":"var(--volume)", "AEC":"var(--aec)", "D&M":"var(--dm)", "M&E":"var(--me)" };
+  var INDUSTRY_BG    = { "Volume":"var(--volume-bg)", "AEC":"var(--aec-bg)", "D&M":"var(--dm-bg)", "M&E":"var(--me-bg)" };
+  var MAX_VISIBLE_SLOTS = 3;
+  var STATUS_LABEL = { reserved:"예약", renting:"대여 중", returned:"반납 완료" };
+
+  /* ================= Date helpers ================= */
+  function pad2(n){ return (n<10?"0":"")+n; }
+  function fmt(d){ return d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate()); }
+  function parse(s){ var p=s.split("-").map(Number); return new Date(p[0],p[1]-1,p[2]); }
+  function stripTime(d){ return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+  function addDays(d,n){ return new Date(d.getFullYear(), d.getMonth(), d.getDate()+n); }
+  function fmtKorean(dstr){
+    var d = parse(dstr);
+    return d.getFullYear()+"."+pad2(d.getMonth()+1)+"."+pad2(d.getDate());
+  }
+  function fmtRange(a,b){ return fmtKorean(a)+" ~ "+fmtKorean(b); }
+  function fmtUsage(r){
+    return r.usageStartDate === r.usageEndDate ? fmtKorean(r.usageStartDate) : fmtRange(r.usageStartDate, r.usageEndDate);
+  }
+
+  var TODAY = stripTime(new Date());
+  var TODAY_STR = fmt(TODAY);
+
+  /* ================= Shared storage: multi-backend ================= */
+  var STORAGE_KEY = "laptop-rental-records";
+  var SYNC_MODE = "local"; // "claude" | "local" — decided in initApp()
+  var isSyncing = false;
+
+  // --- Backend: Claude artifact storage (window.storage) ---
+  // window.storage can appear a moment after the page loads, so we don't trust a single
+  // synchronous check. We retry briefly, then actually try a call.
+  async function verifyClaudeStorage(){
+    for(var attempt=0; attempt<4; attempt++){
+      if(window.storage && typeof window.storage.get === "function" && typeof window.storage.set === "function"){
+        try{ await window.storage.list(STORAGE_KEY, true); return true; }
+        catch(err){ return true; } // API exists and responded — good enough
+      }
+      await new Promise(function(resolve){ setTimeout(resolve, 350); });
+    }
+    return false;
+  }
+  async function loadFromClaudeStorage(){
+    try{
+      var result = await window.storage.get(STORAGE_KEY, true);
+      return (result && typeof result.value === "string") ? JSON.parse(result.value) : null;
+    } catch(err){ return null; }
+  }
+  async function saveToClaudeStorage(){
+    try{
+      var json = JSON.stringify(rentals);
+      var result = await window.storage.set(STORAGE_KEY, json, true);
+      if(result){ lastSyncedJSON = json; }
+      return !!result;
+    } catch(err){ return false; }
+  }
+
+  // --- Unified interface used by the rest of the app ---
+  async function loadShared(){
+    if(SYNC_MODE === "claude") return loadFromClaudeStorage();
+    return null;
+  }
+  async function saveShared(){
+    if(SYNC_MODE === "claude") return saveToClaudeStorage();
+    return false;
+  }
+
+  function isAnyModalOpen(){
+    return !formOverlay.classList.contains("hidden") ||
+           !detailOverlay.classList.contains("hidden") ||
+           !settingsOverlay.classList.contains("hidden");
+  }
+
+  async function pollForUpdates(){
+    if(SYNC_MODE !== "claude" || isSyncing || isAnyModalOpen()) return;
+    isSyncing = true;
+    try{
+      var remote = await loadFromClaudeStorage();
+      if(remote){
+        var remoteJSON = JSON.stringify(remote);
+        if(remoteJSON !== lastSyncedJSON){
+          rentals = remote;
+          lastSyncedJSON = remoteJSON;
+          render();
+          showSyncBadge("방금 동기화됨");
+        }
+      }
+    } catch(err){ /* ignore transient poll errors */ }
+    finally { isSyncing = false; }
+  }
+
+  function showSyncBadge(text){
+    var el = document.getElementById("syncStatus");
+    if(!el) return;
+    el.textContent = text;
+    el.classList.remove("hidden");
+    clearTimeout(showSyncBadge._t);
+    showSyncBadge._t = setTimeout(function(){ el.classList.add("hidden"); }, 2500);
+  }
+
+  function updateSharedBadge(){
+    var badgeText = document.getElementById("sharedBadgeText");
+    var badge = document.getElementById("sharedBadge");
+    if(SYNC_MODE === "claude"){
+      badgeText.textContent = "팀 공유 데이터";
+      badge.title = "이 화면의 모든 데이터는 이 앱을 여는 모든 사람에게 공유됩니다";
+    } else {
+      badgeText.textContent = "이 화면에만 저장됨";
+      badge.title = "공유 저장소가 연결되지 않아 이 브라우저 탭에만 데이터가 존재합니다";
+    }
+  }
+
+  /* ================= Admin auth (client-side, view/edit gating only) ================= */
+  // NOTE: this is a soft UI gate, not real security — anyone can read this file's source
+  // and see ADMIN_PASSWORD. Use it to keep casual viewers from editing data by mistake,
+  // not to protect sensitive information.
+  var ADMIN_PASSWORD = "SCK2187"; // change this before sharing the file with your team
+
+  /* ================= Seed data (used only the very first time, before anyone has saved data) ================= */
+  function iso(y,m,d){ return y+"-"+pad2(m)+"-"+pad2(d); }
+
+  var SEED_RENTALS = [
+  {
+    "id": "r1",
+    "industry": "Volume",
+    "trainingName": "국제우주항공기술대전",
+    "region": "창원",
+    "location": "창원컨벤션센터",
+    "quantity": 1,
+    "rentalDate": "2026-09-29",
+    "usageStartDate": "2026-09-30",
+    "usageEndDate": "2026-09-30",
+    "returnDate": "2026-10-02",
+    "manualReturned": false,
+    "createdAt": "2026-09-29",
+    "updatedAt": "2026-09-29"
+  },
+  {
+    "id": "r2",
+    "industry": "Volume",
+    "trainingName": "?",
+    "region": "?",
+    "location": "?",
+    "quantity": 1,
+    "rentalDate": "2026-10-05",
+    "usageStartDate": "2026-10-05",
+    "usageEndDate": "2026-10-05",
+    "returnDate": "2026-10-05",
+    "manualReturned": false,
+    "createdAt": "2026-10-05",
+    "updatedAt": "2026-10-05"
+  },
+  {
+    "id": "r3",
+    "industry": "Volume",
+    "trainingName": "AutoCAD 정기교육",
+    "region": "천안아산",
+    "location": "미정",
+    "quantity": 15,
+    "rentalDate": "2026-10-12",
+    "usageStartDate": "2026-10-14",
+    "usageEndDate": "2026-10-15",
+    "returnDate": "2026-10-16",
+    "manualReturned": false,
+    "createdAt": "2026-10-12",
+    "updatedAt": "2026-10-12"
+  },
+  {
+    "id": "r4",
+    "industry": "Volume",
+    "trainingName": "?",
+    "region": "?",
+    "location": "?",
+    "quantity": 15,
+    "rentalDate": "2026-10-19",
+    "usageStartDate": "2026-10-19",
+    "usageEndDate": "2026-10-19",
+    "returnDate": "2026-10-19",
+    "manualReturned": false,
+    "createdAt": "2026-10-19",
+    "updatedAt": "2026-10-19"
+  },
+  {
+    "id": "r5",
+    "industry": "D&M",
+    "trainingName": "율촌화학 PDMC 교육(메타유닉스)_Bill",
+    "region": "서울",
+    "location": "율촌화학",
+    "quantity": 8,
+    "rentalDate": "2026-10-20",
+    "usageStartDate": "2026-10-21",
+    "usageEndDate": "2026-10-21",
+    "returnDate": "2026-10-22",
+    "manualReturned": false,
+    "createdAt": "2026-10-20",
+    "updatedAt": "2026-10-20"
+  },
+  {
+    "id": "r6",
+    "industry": "M&E",
+    "trainingName": "Flow Studio+Motionbuilder 개념잡기",
+    "region": "서울, 경기, 인천",
+    "location": "Autodesk 교육장",
+    "quantity": 15,
+    "rentalDate": "2026-10-27",
+    "usageStartDate": "2026-10-27",
+    "usageEndDate": "2026-10-27",
+    "returnDate": "2026-10-27",
+    "manualReturned": false,
+    "createdAt": "2026-10-27",
+    "updatedAt": "2026-10-27"
+  },
+  {
+    "id": "r7",
+    "industry": "AEC",
+    "trainingName": "AEC Docs & Forma 정기교육",
+    "region": "충청/대전",
+    "location": "미정",
+    "quantity": 15,
+    "rentalDate": "2026-11-02",
+    "usageStartDate": "2026-11-04",
+    "usageEndDate": "2026-11-04",
+    "returnDate": "2026-11-05",
+    "manualReturned": false,
+    "createdAt": "2026-11-02",
+    "updatedAt": "2026-11-02"
+  },
+  {
+    "id": "r8",
+    "industry": "Volume",
+    "trainingName": "?",
+    "region": "?",
+    "location": "?",
+    "quantity": 15,
+    "rentalDate": "2026-11-13",
+    "usageStartDate": "2026-11-13",
+    "usageEndDate": "2026-11-13",
+    "returnDate": "2026-11-13",
+    "manualReturned": false,
+    "createdAt": "2026-11-13",
+    "updatedAt": "2026-11-13"
+  },
+  {
+    "id": "r9",
+    "industry": "Volume",
+    "trainingName": "AutoCAD 정기교육",
+    "region": "창원",
+    "location": "창원",
+    "quantity": 15,
+    "rentalDate": "2026-11-16",
+    "usageStartDate": "2026-11-17",
+    "usageEndDate": "2026-11-18",
+    "returnDate": "2026-11-20",
+    "manualReturned": false,
+    "createdAt": "2026-11-16",
+    "updatedAt": "2026-11-16"
+  },
+  {
+    "id": "r10",
+    "industry": "Volume",
+    "trainingName": "AutoCAD 정기교육",
+    "region": "서울, 경기, 인천",
+    "location": "Autodesk 교육장",
+    "quantity": 1,
+    "rentalDate": "2026-11-23",
+    "usageStartDate": "2026-11-24",
+    "usageEndDate": "2026-11-24",
+    "returnDate": "2026-11-25",
+    "manualReturned": false,
+    "createdAt": "2026-11-23",
+    "updatedAt": "2026-11-23"
+  },
+  {
+    "id": "r11",
+    "industry": "M&E",
+    "trainingName": "Autodesk AI교육",
+    "region": "서울, 경기, 인천",
+    "location": "Autodesk 교육장",
+    "quantity": 15,
+    "rentalDate": "2026-12-15",
+    "usageStartDate": "2026-12-15",
+    "usageEndDate": "2026-12-15",
+    "returnDate": "2026-12-15",
+    "manualReturned": false,
+    "createdAt": "2026-12-15",
+    "updatedAt": "2026-12-15"
+  }
+];
+
+  var rentals = [];           // live, shared dataset (populated after loading from storage)
+  var lastSyncedJSON = null;  // last known serialized state, used to detect remote changes
+
+  /* ================= App state ================= */
+  var state = {
+    viewYear: TODAY.getFullYear(),
+    viewMonth: TODAY.getMonth(), // 0-indexed
+    filterIndustry: "all",
+    searchTerm: "",
+    editingId: null,
+    isAdmin: false
+  };
+
+  /* ================= Core logic ================= */
+  function getEffectiveStatus(r){
+    if(r.manualReturned) return "returned";
+    var t = TODAY;
+    var rd = parse(r.rentalDate), rt = parse(r.returnDate);
+    if(t < rd) return "reserved";
+    if(t > rt) return "returned";
+    return "renting";
+  }
+
+  var RETURNED_COLOR = "#9AA3AF"; // neutral gray used once a rental is returned
+  function getDisplayColor(r){
+    return getEffectiveStatus(r) === "returned" ? RETURNED_COLOR : INDUSTRY_COLOR[r.industry];
+  }
+
+  // Capacity (the 15-laptop cap) is enforced only against the actual USAGE period
+  // (usageStartDate ~ usageEndDate) — the period the laptops are in active use. The
+  // rental date and return date are just pickup/drop-off logistics around that, so they
+  // are intentionally left out of this check and can freely overlap with other bookings'
+  // rental/return dates.
+  function overlapsDate(r, dateStr){
+    return r.usageStartDate <= dateStr && dateStr <= r.usageEndDate;
+  }
+
+  // Quantity of laptops occupied on a given date, across ALL rentals that still "count"
+  // (i.e. not manually returned early), optionally excluding one rental (for edit mode).
+  function usedOnDate(dateStr, excludeId){
+    var sum = 0;
+    for(var i=0;i<rentals.length;i++){
+      var r = rentals[i];
+      if(excludeId && r.id === excludeId) continue;
+      if(r.manualReturned) continue;
+      if(overlapsDate(r, dateStr)) sum += r.quantity;
+    }
+    return sum;
+  }
+
+  function minAvailableInRange(startStr, endStr, excludeId){
+    var start = parse(startStr), end = parse(endStr);
+    if(end < start) return TOTAL_LAPTOPS;
+    var min = TOTAL_LAPTOPS;
+    var cur = start;
+    var guard = 0;
+    while(cur <= end && guard < 400){
+      var used = usedOnDate(fmt(cur), excludeId);
+      var avail = TOTAL_LAPTOPS - used;
+      if(avail < min) min = avail;
+      cur = addDays(cur,1);
+      guard++;
+    }
+    return min;
+  }
+
+  function matchesFilter(r){
+    if(state.filterIndustry !== "all" && r.industry !== state.filterIndustry) return false;
+    if(state.searchTerm){
+      var q = state.searchTerm.toLowerCase();
+      var hay = (r.trainingName+" "+r.region+" "+r.location).toLowerCase();
+      if(hay.indexOf(q) === -1) return false;
+    }
+    return true;
+  }
+
+  /* ================= Rendering: summary cards ================= */
+  function renderSummary(){
+    var inUse = 0;
+    var returnToday = 0;
+    for(var i=0;i<rentals.length;i++){
+      var r = rentals[i];
+      var status = getEffectiveStatus(r);
+      if(status === "renting") inUse += r.quantity;
+      if(!r.manualReturned && r.returnDate === TODAY_STR) returnToday += r.quantity;
+    }
+    var available = TOTAL_LAPTOPS - inUse;
+    if(available < 0) available = 0;
+
+    var cards = [
+      { label:"전체 노트북", dot:"total", value: TOTAL_LAPTOPS, unit:"대" },
+      { label:"현재 대여 중", dot:"inuse", value: inUse, unit:"대" },
+      { label:"사용 가능", dot:"available", value: available, unit:"대" },
+      { label:"오늘 반납 예정", dot:"returntoday", value: returnToday, unit:"대" }
+    ];
+    var html = cards.map(function(c){
+      return '<div class="summary-card">'+
+        '<div class="label"><span class="dot '+c.dot+'"></span>'+c.label+'</div>'+
+        '<div class="value">'+c.value+'<span>'+c.unit+'</span></div>'+
+      '</div>';
+    }).join("");
+    document.getElementById("summaryGrid").innerHTML = html;
+  }
+
+  /* ================= Rendering: industry usage ================= */
+  function renderIndustryUsage(){
+    var byIndustry = {};
+    INDUSTRIES.forEach(function(ind){ byIndustry[ind] = 0; });
+    rentals.forEach(function(r){
+      if(getEffectiveStatus(r) === "renting"){
+        byIndustry[r.industry] += r.quantity;
+      }
+    });
+    var html = INDUSTRIES.map(function(ind){
+      var qty = byIndustry[ind];
+      var pct = Math.min(100, Math.round((qty/TOTAL_LAPTOPS)*100));
+      return '<div class="industry-row">'+
+        '<div class="industry-row-top">'+
+          '<div class="industry-name"><span class="dot" style="background:'+INDUSTRY_COLOR[ind]+'"></span>'+ind+'</div>'+
+          '<div class="industry-qty"><b>'+qty+'</b>대 / '+TOTAL_LAPTOPS+'대</div>'+
+        '</div>'+
+        '<div class="bar-track"><div class="bar-fill" style="width:'+pct+'%;background:'+INDUSTRY_COLOR[ind]+'"></div></div>'+
+      '</div>';
+    }).join("");
+    document.getElementById("industryGrid").innerHTML = html;
+  }
+
+  /* ================= Rendering: filter chips ================= */
+  function renderFilters(){
+    var opts = [{key:"all", label:"전체"}].concat(INDUSTRIES.map(function(i){return {key:i,label:i};}));
+    var html = opts.map(function(o){
+      var isActive = state.filterIndustry === o.key;
+      var activeClass = isActive ? " active" : "";
+      var style = "";
+      if(o.key !== "all"){
+        var color = INDUSTRY_COLOR[o.key];
+        style = isActive
+          ? ' style="background:'+color+';border-color:'+color+';color:#fff;"'
+          : ' style="border-color:'+color+';color:'+color+';"';
+      }
+      return '<button class="filter-chip'+activeClass+'" data-industry="'+o.key+'"'+style+'>'+o.label+'</button>';
+    }).join("");
+    document.getElementById("filterGroup").innerHTML = html;
+  }
+
+  /* ================= Rendering: calendar ================= */
+  function renderMonthLabel(){
+    document.getElementById("monthLabel").textContent = state.viewYear+"년 "+(state.viewMonth+1)+"월";
+  }
+
+  function renderCalendar(){
+    renderMonthLabel();
+    var gridEl = document.getElementById("calGrid");
+    var firstOfMonth = new Date(state.viewYear, state.viewMonth, 1);
+    var firstWeekday = firstOfMonth.getDay();
+    var gridStart = new Date(state.viewYear, state.viewMonth, 1 - firstWeekday);
+    var cellDates = [];
+    for(var i=0;i<42;i++){ cellDates.push(addDays(gridStart,i)); }
+
+    var gridStartStr = fmt(cellDates[0]);
+    var gridEndStr = fmt(cellDates[41]);
+
+    // events visible in this grid range, matching filters
+    var visibleEvents = rentals.filter(function(r){
+      if(!matchesFilter(r)) return false;
+      return r.rentalDate <= gridEndStr && r.returnDate >= gridStartStr;
+    }).sort(function(a,b){
+      if(a.rentalDate !== b.rentalDate) return a.rentalDate < b.rentalDate ? -1 : 1;
+      return a.id < b.id ? -1 : 1;
+    });
+
+    // slot assignment (greedy interval scheduling across the 42-day grid)
+    var slotLastIndex = []; // slotLastIndex[s] = last day-index occupied by that slot
+    var eventMeta = {}; // id -> {slot, startIdx, endIdx}
+    visibleEvents.forEach(function(r){
+      var startIdx = Math.max(0, Math.floor((parse(r.rentalDate) - cellDates[0]) / 86400000));
+      var endIdx = Math.min(41, Math.floor((parse(r.returnDate) - cellDates[0]) / 86400000));
+      var slot = -1;
+      for(var s=0;s<slotLastIndex.length;s++){
+        if(slotLastIndex[s] < startIdx){ slot = s; break; }
+      }
+      if(slot === -1){ slot = slotLastIndex.length; }
+      slotLastIndex[slot] = endIdx;
+      eventMeta[r.id] = { slot:slot, startIdx:startIdx, endIdx:endIdx, rental:r };
+    });
+
+    // events per day-index (for hidden-count + capacity)
+    var eventsByDayIdx = [];
+    for(var d=0; d<42; d++) eventsByDayIdx.push([]);
+    visibleEvents.forEach(function(r){
+      var m = eventMeta[r.id];
+      for(var d2=m.startIdx; d2<=m.endIdx; d2++) eventsByDayIdx[d2].push(r);
+    });
+
+    var cellsHtml = "";
+    for(var idx=0; idx<42; idx++){
+      var d = cellDates[idx];
+      var dStr = fmt(d);
+      var inMonth = d.getMonth() === state.viewMonth;
+      var isToday = dStr === TODAY_STR;
+      var dow = d.getDay();
+
+      var classes = "cal-cell" + (inMonth ? "" : " other-month") + (isToday ? " today" : "");
+      var dayNumClass = "day-num" + (dow===0?" sun":"") + (dow===6?" sat":"");
+
+      // capacity badge (based on ALL rentals, not filtered)
+      var used = usedOnDate(dStr, null);
+      var capClass = used >= TOTAL_LAPTOPS ? "full" : (used >= TOTAL_LAPTOPS*0.6 ? "mid" : "low");
+      var capText = used >= TOTAL_LAPTOPS ? "대여 불가" : (used+"/"+TOTAL_LAPTOPS);
+
+      var head = '<div class="cal-cell-head">'+
+          '<span class="'+dayNumClass+'">'+d.getDate()+'</span>'+
+          '<span class="cap-badge '+capClass+'">'+capText+'</span>'+
+        '</div>';
+
+      // build slot rows for this day
+      var dayEvents = eventsByDayIdx[idx];
+      var slotMap = {};
+      dayEvents.forEach(function(r){ slotMap[eventMeta[r.id].slot] = r; });
+
+      var rowsHtml = "";
+      var hiddenCount = 0;
+      for(var s=0; s<MAX_VISIBLE_SLOTS; s++){
+        if(slotMap[s]){
+          var r = slotMap[s];
+          var m = eventMeta[r.id];
+          var isStart = idx === m.startIdx;
+          var isEnd = idx === m.endIdx;
+          var posClass = (isStart && isEnd) ? "solo" : (isStart ? "start" : (isEnd ? "end" : ""));
+          rowsHtml += '<div class="event-pill '+posClass+'" style="background:'+getDisplayColor(r)+'" data-rental-id="'+r.id+'">'+
+            (isStart ? (r.industry+" | "+r.trainingName+" | "+r.quantity+"대") : "&nbsp;") +
+          '</div>';
+        } else {
+          rowsHtml += '<div class="event-spacer"></div>';
+        }
+      }
+      Object.keys(slotMap).forEach(function(s){
+        if(Number(s) >= MAX_VISIBLE_SLOTS) hiddenCount++;
+      });
+      if(hiddenCount > 0){
+        rowsHtml += '<div class="more-link">+'+hiddenCount+'건 더보기</div>';
+      }
+
+      cellsHtml += '<div class="'+classes+'" data-date="'+dStr+'">'+head+rowsHtml+'</div>';
+    }
+    gridEl.innerHTML = cellsHtml;
+  }
+
+  /* ================= Rendering: monthly status panel ================= */
+  function renderTodayPanel(){
+    document.getElementById("todayDateLabel").textContent = state.viewYear+"년 "+(state.viewMonth+1)+"월 기준";
+
+    var monthStart = fmt(new Date(state.viewYear, state.viewMonth, 1));
+    var monthEnd = fmt(new Date(state.viewYear, state.viewMonth + 1, 0));
+
+    var monthly = rentals.filter(function(r){
+      if(!matchesFilter(r)) return false;
+      return r.rentalDate <= monthEnd && r.returnDate >= monthStart;
+    }).sort(function(a,b){ return a.rentalDate < b.rentalDate ? -1 : 1; });
+
+    var listEl = document.getElementById("todayList");
+    if(monthly.length === 0){
+      listEl.innerHTML = '<div class="empty-state">이번 달에는 대여 일정이 없습니다.</div>';
+      return;
+    }
+    listEl.innerHTML = monthly.map(function(r){
+      var status = getEffectiveStatus(r);
+      return '<div class="today-item" data-rental-id="'+r.id+'" style="border-left-color:'+getDisplayColor(r)+'">'+
+        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">'+
+          '<span class="tag" style="background:'+getDisplayColor(r)+';margin-bottom:0;">'+r.industry+'</span>'+
+          '<span class="status-badge '+status+'">'+STATUS_LABEL[status]+'</span>'+
+        '</div>'+
+        '<div class="name">'+escapeHtml(r.trainingName)+'</div>'+
+        '<div class="meta">'+escapeHtml(r.region)+' / '+escapeHtml(r.location)+'</div>'+
+        '<div class="meta qty">'+r.quantity+'대 · '+fmtRange(r.rentalDate, r.returnDate)+'</div>'+
+      '</div>';
+    }).join("");
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+
+  /* ================= Master render ================= */
+  function render(){
+    renderSummary();
+    renderIndustryUsage();
+    renderFilters();
+    renderCalendar();
+    renderTodayPanel();
+  }
+
+  /* ================= Tooltip ================= */
+  var tooltipEl = document.getElementById("tooltip");
+  function showTooltip(evt, rental){
+    var status = getEffectiveStatus(rental);
+    tooltipEl.innerHTML =
+      '<span class="tt-tag">'+rental.industry+'</span>'+
+      '<div class="tt-title">'+escapeHtml(rental.trainingName)+'</div>'+
+      '<div class="tt-row"><span>지역</span><span>'+escapeHtml(rental.region)+'</span></div>'+
+      '<div class="tt-row"><span>장소</span><span>'+escapeHtml(rental.location)+'</span></div>'+
+      '<div class="tt-row"><span>대여일</span><span>'+fmtKorean(rental.rentalDate)+'</span></div>'+
+      '<div class="tt-row"><span>사용일</span><span>'+fmtUsage(rental)+'</span></div>'+
+      '<div class="tt-row"><span>반납일</span><span>'+fmtKorean(rental.returnDate)+'</span></div>'+
+      '<div class="tt-row"><span>사용 대수</span><span>'+rental.quantity+'대</span></div>'+
+      '<div class="tt-status" style="color:'+getDisplayColor(rental)+'">'+STATUS_LABEL[status]+'</div>';
+    tooltipEl.classList.remove("hidden");
+    positionTooltip(evt);
+  }
+  function positionTooltip(evt){
+    var x = evt.clientX + 16;
+    var y = evt.clientY + 16;
+    var w = 230, h = tooltipEl.offsetHeight || 200;
+    if(x + w > window.innerWidth - 12) x = evt.clientX - w - 16;
+    if(y + h > window.innerHeight - 12) y = evt.clientY - h - 16;
+    tooltipEl.style.left = x+"px";
+    tooltipEl.style.top = y+"px";
+  }
+  function hideTooltip(){ tooltipEl.classList.add("hidden"); }
+
+  /* ================= Add/Edit Modal ================= */
+  var formOverlay = document.getElementById("formOverlay");
+  var fRentalDate = document.getElementById("fRentalDate");
+  var fUsageStartDate = document.getElementById("fUsageStartDate");
+  var fUsageEndDate = document.getElementById("fUsageEndDate");
+  var fReturnDate = document.getElementById("fReturnDate");
+  var industryPicker = document.getElementById("industryPicker");
+  var fQuantity = document.getElementById("fQuantity");
+  var fTrainingName = document.getElementById("fTrainingName");
+  var fRegion = document.getElementById("fRegion");
+  var fLocation = document.getElementById("fLocation");
+  var formError = document.getElementById("formError");
+  var availabilityHint = document.getElementById("availabilityHint");
+
+  function setSelectedIndustry(industry){
+    var buttons = industryPicker.querySelectorAll(".industry-option");
+    buttons.forEach(function(btn){
+      btn.classList.toggle("selected", btn.getAttribute("data-industry") === industry);
+    });
+  }
+  function getSelectedIndustry(){
+    var selected = industryPicker.querySelector(".industry-option.selected");
+    return selected ? selected.getAttribute("data-industry") : null;
+  }
+  industryPicker.addEventListener("click", function(e){
+    var btn = e.target.closest(".industry-option");
+    if(!btn) return;
+    setSelectedIndustry(btn.getAttribute("data-industry"));
+  });
+
+  function openAddModal(prefillDate){
+    state.editingId = null;
+    document.getElementById("formTitle").textContent = "대여 등록";
+    formError.classList.add("hidden");
+    fRentalDate.value = prefillDate || TODAY_STR;
+    fUsageStartDate.value = prefillDate || TODAY_STR;
+    fUsageEndDate.value = prefillDate || TODAY_STR;
+    fReturnDate.value = prefillDate || TODAY_STR;
+    setSelectedIndustry("Volume");
+    fQuantity.value = 1;
+    fTrainingName.value = "";
+    fRegion.value = "";
+    fLocation.value = "";
+    updateAvailabilityHint();
+    formOverlay.classList.remove("hidden");
+  }
+
+  function openEditModal(id){
+    var r = rentals.find(function(x){ return x.id === id; });
+    if(!r) return;
+    state.editingId = id;
+    document.getElementById("formTitle").textContent = "대여 수정";
+    formError.classList.add("hidden");
+    fRentalDate.value = r.rentalDate;
+    fUsageStartDate.value = r.usageStartDate;
+    fUsageEndDate.value = r.usageEndDate;
+    fReturnDate.value = r.returnDate;
+    setSelectedIndustry(r.industry);
+    fQuantity.value = r.quantity;
+    fTrainingName.value = r.trainingName;
+    fRegion.value = r.region;
+    fLocation.value = r.location;
+    updateAvailabilityHint();
+    closeDetail();
+    formOverlay.classList.remove("hidden");
+  }
+
+  function closeForm(){ formOverlay.classList.add("hidden"); }
+
+  function updateAvailabilityHint(){
+    var us = fUsageStartDate.value, ue = fUsageEndDate.value;
+    if(!us || !ue){ availabilityHint.textContent = ""; return; }
+    if(parse(ue) < parse(us)){
+      availabilityHint.textContent = "사용 종료일은 사용 시작일 이후여야 합니다.";
+      availabilityHint.classList.add("warn");
+      return;
+    }
+    var minAvail = minAvailableInRange(us, ue, state.editingId);
+    availabilityHint.classList.remove("warn");
+    availabilityHint.textContent = "선택한 사용 기간 중 최소 사용 가능 대수: "+minAvail+"대 (전체 "+TOTAL_LAPTOPS+"대 중)";
+    if(minAvail <= 0){ availabilityHint.classList.add("warn"); }
+  }
+  [fUsageStartDate, fUsageEndDate].forEach(function(el){
+    el.addEventListener("change", updateAvailabilityHint);
+  });
+
+  async function saveForm(){
+    if(!state.isAdmin) return;
+    var rd = fRentalDate.value, us = fUsageStartDate.value, ue = fUsageEndDate.value, ret = fReturnDate.value;
+    var industry = getSelectedIndustry();
+    var qty = parseInt(fQuantity.value, 10);
+    var trainingName = fTrainingName.value.trim();
+    var region = fRegion.value.trim();
+    var location = fLocation.value.trim();
+
+    if(!industry){
+      return showFormError("사용처 / Industry를 선택해주세요.");
+    }
+    if(!rd || !us || !ue || !ret || !trainingName || !region || !location){
+      return showFormError("모든 항목을 입력해주세요.");
+    }
+    if(!(rd <= us && us <= ue && ue <= ret)){
+      return showFormError("날짜 순서를 확인해주세요. (대여일 ≤ 사용 시작일 ≤ 사용 종료일 ≤ 반납일)");
+    }
+    if(!qty || qty < 1 || qty > TOTAL_LAPTOPS){
+      return showFormError("사용 대수는 1~"+TOTAL_LAPTOPS+" 사이여야 합니다.");
+    }
+
+    var minAvail = minAvailableInRange(us, ue, state.editingId);
+    if(qty > minAvail){
+      return showFormError("해당 사용 기간에는 노트북이 "+minAvail+"대만 사용 가능합니다.");
+    }
+
+    var now = fmt(new Date());
+    if(state.editingId){
+      var r = rentals.find(function(x){ return x.id === state.editingId; });
+      r.rentalDate = rd; r.usageStartDate = us; r.usageEndDate = ue; r.returnDate = ret;
+      r.industry = industry; r.quantity = qty;
+      r.trainingName = trainingName; r.region = region; r.location = location;
+      r.updatedAt = now;
+    } else {
+      rentals.push({
+        id: "r"+Date.now(),
+        industry: industry, trainingName: trainingName, region: region, location: location,
+        quantity: qty, rentalDate: rd, usageStartDate: us, usageEndDate: ue, returnDate: ret,
+        manualReturned:false, createdAt: now, updatedAt: now
+      });
+    }
+    closeForm();
+    render();
+    var ok = await saveShared();
+    showSyncBadge(ok ? "저장됨 · 공유됨" : "저장 실패 · 이 화면에만 임시 반영됨");
+  }
+
+  function showFormError(msg){
+    formError.textContent = msg;
+    formError.classList.remove("hidden");
+  }
+
+  /* ================= Detail Modal ================= */
+  var detailOverlay = document.getElementById("detailOverlay");
+  var detailBody = document.getElementById("detailBody");
+  var currentDetailId = null;
+
+  function openDetail(id){
+    var r = rentals.find(function(x){ return x.id === id; });
+    if(!r) return;
+    currentDetailId = id;
+    var status = getEffectiveStatus(r);
+    detailBody.innerHTML =
+      '<div style="margin-bottom:12px;display:flex;align-items:center;gap:8px;">'+
+        '<span class="dot" style="width:10px;height:10px;background:'+INDUSTRY_COLOR[r.industry]+'"></span>'+
+        '<strong style="font-size:14.5px;">'+r.industry+'</strong>'+
+        '<span class="status-badge '+status+'">'+STATUS_LABEL[status]+'</span>'+
+      '</div>'+
+      '<dl class="detail-grid">'+
+        '<dt>교육명</dt><dd>'+escapeHtml(r.trainingName)+'</dd>'+
+        '<dt>대여일</dt><dd>'+fmtKorean(r.rentalDate)+'</dd>'+
+        '<dt>사용일</dt><dd>'+fmtUsage(r)+'</dd>'+
+        '<dt>반납일</dt><dd>'+fmtKorean(r.returnDate)+'</dd>'+
+        '<dt>지역</dt><dd>'+escapeHtml(r.region)+'</dd>'+
+        '<dt>장소</dt><dd>'+escapeHtml(r.location)+'</dd>'+
+        '<dt>사용 대수</dt><dd>'+r.quantity+'대</dd>'+
+      '</dl>';
+    var returnBtn = document.getElementById("btnReturnDetail");
+    returnBtn.disabled = status === "returned";
+    returnBtn.style.opacity = status === "returned" ? "0.5" : "1";
+    document.getElementById("detailAdminFoot").classList.toggle("hidden", !state.isAdmin);
+    detailOverlay.classList.remove("hidden");
+  }
+  function closeDetail(){ detailOverlay.classList.add("hidden"); currentDetailId = null; }
+
+  /* ================= Event wiring ================= */
+  document.getElementById("btnOpenAdd").addEventListener("click", function(){
+    if(!state.isAdmin) return;
+    openAddModal(null);
+  });
+  document.getElementById("btnCloseForm").addEventListener("click", closeForm);
+  document.getElementById("btnCancelForm").addEventListener("click", closeForm);
+  document.getElementById("btnSaveForm").addEventListener("click", saveForm);
+  formOverlay.addEventListener("click", function(e){ if(e.target === formOverlay) closeForm(); });
+
+  document.getElementById("btnCloseDetail").addEventListener("click", closeDetail);
+  detailOverlay.addEventListener("click", function(e){ if(e.target === detailOverlay) closeDetail(); });
+  document.getElementById("btnEditDetail").addEventListener("click", function(){
+    if(!state.isAdmin || !currentDetailId) return;
+    openEditModal(currentDetailId);
+  });
+  document.getElementById("btnDeleteDetail").addEventListener("click", async function(){
+    if(!state.isAdmin || !currentDetailId) return;
+    if(confirm("이 대여 일정을 삭제하시겠습니까?")){
+      rentals = rentals.filter(function(r){ return r.id !== currentDetailId; });
+      closeDetail();
+      render();
+      var ok = await saveShared();
+      showSyncBadge(ok ? "삭제됨 · 공유됨" : "삭제 실패 · 이 화면에만 임시 반영됨");
+    }
+  });
+  document.getElementById("btnReturnDetail").addEventListener("click", async function(){
+    if(!state.isAdmin || !currentDetailId) return;
+    var r = rentals.find(function(x){ return x.id === currentDetailId; });
+    if(r){ r.manualReturned = true; r.updatedAt = fmt(new Date()); }
+    closeDetail();
+    render();
+    var ok = await saveShared();
+    showSyncBadge(ok ? "반납 처리됨 · 공유됨" : "저장 실패 · 이 화면에만 임시 반영됨");
+  });
+
+  document.getElementById("btnPrevMonth").addEventListener("click", function(){
+    state.viewMonth--;
+    if(state.viewMonth < 0){ state.viewMonth = 11; state.viewYear--; }
+    render();
+  });
+  document.getElementById("btnNextMonth").addEventListener("click", function(){
+    state.viewMonth++;
+    if(state.viewMonth > 11){ state.viewMonth = 0; state.viewYear++; }
+    render();
+  });
+  document.getElementById("btnToday").addEventListener("click", function(){
+    state.viewYear = TODAY.getFullYear();
+    state.viewMonth = TODAY.getMonth();
+    render();
+  });
+
+  document.getElementById("searchInput").addEventListener("input", function(e){
+    state.searchTerm = e.target.value.trim();
+    renderCalendar();
+    renderTodayPanel();
+  });
+
+  document.getElementById("filterGroup").addEventListener("click", function(e){
+    var chip = e.target.closest(".filter-chip");
+    if(!chip) return;
+    state.filterIndustry = chip.getAttribute("data-industry");
+    renderFilters();
+    renderCalendar();
+    renderTodayPanel();
+  });
+
+  /* ---- Admin login ---- */
+  var loginOverlay = document.getElementById("loginOverlay");
+  var fLoginPassword = document.getElementById("fLoginPassword");
+  var loginError = document.getElementById("loginError");
+
+  function openLogin(){
+    fLoginPassword.value = "";
+    loginError.classList.add("hidden");
+    loginOverlay.classList.remove("hidden");
+    setTimeout(function(){ fLoginPassword.focus(); }, 50);
+  }
+  function closeLogin(){ loginOverlay.classList.add("hidden"); }
+
+  function submitLogin(){
+    if(fLoginPassword.value === ADMIN_PASSWORD){
+      state.isAdmin = true;
+      closeLogin();
+      updateAdminUI();
+    } else {
+      loginError.classList.remove("hidden");
+    }
+  }
+
+  function logout(){
+    state.isAdmin = false;
+    updateAdminUI();
+  }
+
+  function updateAdminUI(){
+    document.getElementById("btnOpenAdd").classList.toggle("hidden", !state.isAdmin);
+    document.getElementById("btnOpenSettings").classList.toggle("hidden", !state.isAdmin);
+    document.getElementById("btnLogin").classList.toggle("hidden", state.isAdmin);
+    document.getElementById("btnLogout").classList.toggle("hidden", !state.isAdmin);
+    document.getElementById("adminPill").classList.toggle("hidden", !state.isAdmin);
+    document.getElementById("viewOnlyHint").classList.toggle("hidden", state.isAdmin);
+  }
+
+  document.getElementById("btnLogin").addEventListener("click", openLogin);
+  document.getElementById("btnLogout").addEventListener("click", logout);
+  document.getElementById("btnCloseLogin").addEventListener("click", closeLogin);
+  document.getElementById("btnCancelLogin").addEventListener("click", closeLogin);
+  document.getElementById("btnSubmitLogin").addEventListener("click", submitLogin);
+  fLoginPassword.addEventListener("keydown", function(e){ if(e.key === "Enter") submitLogin(); });
+  loginOverlay.addEventListener("click", function(e){ if(e.target === loginOverlay) closeLogin(); });
+
+  /* ---- Settings: password change + current-file download (admin only) ---- */
+  var settingsOverlay = document.getElementById("settingsOverlay");
+  var fCurrentPassword = document.getElementById("fCurrentPassword");
+  var fNewPassword = document.getElementById("fNewPassword");
+  var fNewPasswordConfirm = document.getElementById("fNewPasswordConfirm");
+  var pwError = document.getElementById("pwError");
+  var pwSuccess = document.getElementById("pwSuccess");
+
+  function openSettings(){
+    if(!state.isAdmin) return;
+    fCurrentPassword.value = "";
+    fNewPassword.value = "";
+    fNewPasswordConfirm.value = "";
+    pwError.classList.add("hidden");
+    pwSuccess.classList.add("hidden");
+    settingsOverlay.classList.remove("hidden");
+  }
+  function closeSettings(){ settingsOverlay.classList.add("hidden"); }
+
+  function changePassword(){
+    pwError.classList.add("hidden");
+    pwSuccess.classList.add("hidden");
+
+    if(fCurrentPassword.value !== ADMIN_PASSWORD){
+      pwError.textContent = "현재 비밀번호가 올바르지 않습니다.";
+      pwError.classList.remove("hidden");
+      return;
+    }
+    if(!fNewPassword.value || fNewPassword.value.length < 4){
+      pwError.textContent = "새 비밀번호는 4자 이상 입력해주세요.";
+      pwError.classList.remove("hidden");
+      return;
+    }
+    if(fNewPassword.value !== fNewPasswordConfirm.value){
+      pwError.textContent = "새 비밀번호 확인이 일치하지 않습니다.";
+      pwError.classList.remove("hidden");
+      return;
+    }
+
+    ADMIN_PASSWORD = fNewPassword.value;
+    fCurrentPassword.value = "";
+    fNewPassword.value = "";
+    fNewPasswordConfirm.value = "";
+    pwSuccess.classList.remove("hidden");
+  }
+
+  // Builds a full, self-contained copy of this page as it exists right now — current
+  // admin password and current rental data baked in as the new defaults — so the
+  // downloaded file opens in the same state when shared with someone else.
+  function buildDownloadableHTML(){
+    closeForm();
+    closeDetail();
+    closeLogin();
+    closeSettings();
+    hideTooltip();
+
+    var html = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+
+    html = html.replace(
+      /var ADMIN_PASSWORD = "[^"]*";/,
+      'var ADMIN_PASSWORD = "' + ADMIN_PASSWORD.replace(/"/g, '\\"') + '";'
+    );
+
+    var seedJson = JSON.stringify(rentals, null, 2);
+    html = html.replace(
+      /var SEED_RENTALS = \[[\s\S]*?\n  \];/,
+      "var SEED_RENTALS = " + seedJson + ";"
+    );
+
+    return html;
+  }
+
+  function downloadCurrentHtml(){
+    var htmlStr = buildDownloadableHTML();
+    var blob = new Blob([htmlStr], { type: "text/html" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "laptop-rental-dashboard.html";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+    showSyncBadge("HTML 파일 다운로드됨");
+  }
+
+  document.getElementById("btnOpenSettings").addEventListener("click", openSettings);
+  document.getElementById("btnCloseSettings").addEventListener("click", closeSettings);
+  document.getElementById("btnCloseSettingsFoot").addEventListener("click", closeSettings);
+  document.getElementById("btnChangePassword").addEventListener("click", changePassword);
+  document.getElementById("btnDownloadHtml").addEventListener("click", downloadCurrentHtml);
+  settingsOverlay.addEventListener("click", function(e){ if(e.target === settingsOverlay) closeSettings(); });
+
+  // Calendar delegation: click on empty cell -> add modal; click on pill -> detail; hover on pill -> tooltip
+  var calGrid = document.getElementById("calGrid");
+  calGrid.addEventListener("click", function(e){
+    var pill = e.target.closest(".event-pill");
+    if(pill){
+      var id = pill.getAttribute("data-rental-id");
+      openDetail(id);
+      return;
+    }
+    var cell = e.target.closest(".cal-cell");
+    if(cell && state.isAdmin){
+      var dateStr = cell.getAttribute("data-date");
+      openAddModal(dateStr);
+    }
+  });
+  calGrid.addEventListener("mouseover", function(e){
+    var pill = e.target.closest(".event-pill");
+    if(!pill) return;
+    var id = pill.getAttribute("data-rental-id");
+    var r = rentals.find(function(x){ return x.id === id; });
+    if(r) showTooltip(e, r);
+  });
+  calGrid.addEventListener("mousemove", function(e){
+    var pill = e.target.closest(".event-pill");
+    if(pill && !tooltipEl.classList.contains("hidden")) positionTooltip(e);
+  });
+  calGrid.addEventListener("mouseout", function(e){
+    var pill = e.target.closest(".event-pill");
+    if(pill) hideTooltip();
+  });
+
+  // Today panel: click item -> detail
+  document.getElementById("todayList").addEventListener("click", function(e){
+    var item = e.target.closest(".today-item");
+    if(item) openDetail(item.getAttribute("data-rental-id"));
+  });
+
+  /* ================= Init ================= */
+  var loadingEl = document.getElementById("loadingScreen");
+  var appEl = document.querySelector(".app");
+  var pollingStarted = false;
+
+  async function initApp(){
+    updateAdminUI();
+
+    var claudeAvailable = await verifyClaudeStorage();
+
+    if(claudeAvailable){
+      SYNC_MODE = "claude";
+      try{
+        var remote = await loadFromClaudeStorage();
+        if(remote && remote.length){
+          rentals = remote;
+          lastSyncedJSON = JSON.stringify(remote);
+        } else {
+          // First time anyone has opened this app: seed shared storage with sample data.
+          rentals = SEED_RENTALS;
+          await saveToClaudeStorage();
+        }
+      } catch(err){
+        rentals = SEED_RENTALS;
+        SYNC_MODE = "local";
+      }
+    } else {
+      // Not running inside a Claude artifact — data stays local to this browser tab only.
+      SYNC_MODE = "local";
+      rentals = rentals.length ? rentals : SEED_RENTALS;
+    }
+
+    updateSharedBadge();
+    loadingEl.classList.add("hidden");
+    appEl.classList.remove("hidden");
+    render();
+
+    if(SYNC_MODE === "claude" && !pollingStarted){
+      pollingStarted = true;
+      setInterval(pollForUpdates, 6000);
+    }
+  }
+
+  initApp();
+})();
+</script>
+<a id="ps-badge" href="https://previewship.com?ref=badge" target="_blank" rel="nofollow noopener noreferrer" style="position:fixed;bottom:12px;right:12px;z-index:2147483647;font-family:-apple-system,system-ui,sans-serif;font-size:12px;line-height:1;background:rgba(0,0,0,.65);color:#fff;padding:5px 10px;border-radius:20px;text-decoration:none;opacity:.82;transition:opacity .2s;cursor:pointer">Deployed with PreviewShip</a>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon="{&quot;version&quot;:&quot;2024.11.0&quot;,&quot;token&quot;:&quot;5b1a02c02a92426c90597ceab44c0b11&quot;,&quot;r&quot;:1,&quot;spa&quot;:2}" crossorigin="anonymous"></script>
+
+
+</body></html>
